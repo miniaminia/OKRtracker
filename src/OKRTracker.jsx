@@ -534,10 +534,7 @@ export default function OKRTracker() {
         objLogs.forEach(log => {
           md += `- **${log.date}** [${log.krLabel}] ${log.text.replace(/\n/g, " ")}\n`;
           (log.links || []).forEach(url => { md += `  - 🔗 ${url}\n`; });
-          (log.files || []).forEach(f => {
-            if (f.type?.startsWith("image/") && f.dataUrl) md += `  - ![${f.name}](${f.dataUrl})\n`;
-            else md += `  - 📎 ${f.name}\n`;
-          });
+          (log.files || []).forEach(f => { md += `  - 📎 ${f.name}\n`; });
         });
         md += "\n";
       }
