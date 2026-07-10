@@ -365,7 +365,7 @@ export default function OKRTracker() {
 
   const sortByDate = (arr) => [...arr].sort((a, b) => b.date.localeCompare(a.date));
 
-  const exportDoc = () => {
+  const buildReportHTML = () => {
     const today = new Date().toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric" });
     const total = totalPct();
 
@@ -488,11 +488,66 @@ export default function OKRTracker() {
 </body>
 </html>`;
 
-    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    return html;
+  };
+
+  const exportPDF = () => {
+    const html = buildReportHTML();
+    const win = window.open("", "_blank");
+    if (!win) {
+      alert("팝업이 차단되었어요. 브라우저 팝업 차단을 해제한 뒤 다시 시도해주세요.");
+      return;
+    }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    const triggerPrint = () => setTimeout(() => win.print(), 300);
+    if (win.document.readyState === "complete") triggerPrint();
+    else win.addEventListener("load", triggerPrint);
+  };
+
+  const exportMarkdown = () => {
+    const today = new Date().toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric" });
+    const total = totalPct();
+
+    let md = `# OKR 2026\n\n민트 · 이모션 신한카드 프로젝트 · Design PL\n\n**전체 달성률: ${total}%** (${today} 기준)\n\n`;
+
+    OBJECTIVES.forEach(obj => {
+      const pct = objPct(obj);
+      const objLogs = sortByDate(logs.filter(l => l.objId === obj.id));
+
+      md += `## ${obj.title} — ${pct}%\n\n${obj.desc}\n\n`;
+
+      obj.keyResults.forEach(kr => {
+        if (kr.noTrack) {
+          md += `- **${kr.label}** (${kr.period})\n`;
+        } else {
+          const cur = progress[kr.id] || 0;
+          const p = Math.round(Math.min((cur / kr.target) * 100, 100));
+          md += `- **${kr.label}** (${kr.period}): ${cur} / ${kr.target}${kr.unit} (${p}%)\n`;
+        }
+      });
+      md += "\n";
+
+      if (objLogs.length) {
+        md += `### 활동 기록 (${objLogs.length}건)\n\n`;
+        objLogs.forEach(log => {
+          md += `- **${log.date}** [${log.krLabel}] ${log.text.replace(/\n/g, " ")}\n`;
+          (log.links || []).forEach(url => { md += `  - 🔗 ${url}\n`; });
+          (log.files || []).forEach(f => {
+            if (f.type?.startsWith("image/") && f.dataUrl) md += `  - ![${f.name}](${f.dataUrl})\n`;
+            else md += `  - 📎 ${f.name}\n`;
+          });
+        });
+        md += "\n";
+      }
+    });
+
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `OKR-2026-${new Date().toISOString().slice(0,10)}.html`;
+    a.download = `OKR-2026-${new Date().toISOString().slice(0,10)}.md`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -760,7 +815,8 @@ export default function OKRTracker() {
         <div className="hdr-bottom">
           <div className="hdr-sub">민트 · 이모션 신한카드 프로젝트 · Design PL</div>
           <div style={{display:"flex",gap:6}}>
-            <button className="export-btn" onClick={exportDoc}>문서로 내보내기</button>
+            <button className="export-btn" onClick={exportPDF}>PDF로 내보내기</button>
+            <button className="export-btn" onClick={exportMarkdown}>MD로 내보내기</button>
             <button className="export-btn" onClick={() => { localStorage.removeItem(PIN_KEY); setUnlocked(false); }}>로그아웃</button>
           </div>
         </div>
