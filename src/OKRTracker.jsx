@@ -363,13 +363,15 @@ export default function OKRTracker() {
     return Math.min(((progress[kr.id] || 0) / kr.target) * 100, 100);
   };
 
+  const sortByDate = (arr) => [...arr].sort((a, b) => b.date.localeCompare(a.date));
+
   const exportDoc = () => {
     const today = new Date().toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric" });
     const total = totalPct();
 
     const objSections = OBJECTIVES.map(obj => {
       const pct = objPct(obj);
-      const objLogs = logs.filter(l => l.objId === obj.id);
+      const objLogs = sortByDate(logs.filter(l => l.objId === obj.id));
 
       const krRows = obj.keyResults.map(kr => {
         if (kr.noTrack) {
@@ -497,7 +499,7 @@ export default function OKRTracker() {
     URL.revokeObjectURL(url);
   };
   const objPct = (obj) => {
-    const v = obj.keyResults.map(kr => krPct(kr));
+    const v = obj.keyResults.filter(kr => !kr.excludeFromPct).map(kr => krPct(kr));
     return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : 0;
   };
   const totalPct = () => {
@@ -785,7 +787,7 @@ export default function OKRTracker() {
       {tab === "overview" && OBJECTIVES.map(obj => {
         const pct = objPct(obj);
         const isOpen = openObj === obj.id;
-        const objLogs = logs.filter(l => l.objId === obj.id).slice(0, 5);
+        const objLogs = sortByDate(logs.filter(l => l.objId === obj.id)).slice(0, 5);
         return (
           <div className="ocard" key={obj.id}>
             <div className="ocard-hdr" onClick={() => setOpenObj(isOpen ? null : obj.id)}>
@@ -864,7 +866,7 @@ export default function OKRTracker() {
       {tab === "logs" && (
         <div>
           {OBJECTIVES.map(obj => {
-            const objLogs = logs.filter(l => l.objId === obj.id);
+            const objLogs = sortByDate(logs.filter(l => l.objId === obj.id));
             if (!objLogs.length) return null;
             return (
               <div key={obj.id}>

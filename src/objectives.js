@@ -8,6 +8,7 @@ export const OBJECTIVES = [
     keyResults: [
       { id: "kr1-1", label: "가이드 설명 자료 제작", target: 3, unit: "건", period: "합계 3건" },
       { id: "kr1-2", label: "팀 내 배포", target: 12, unit: "회", period: "월 1회" },
+      { id: "kr1-3", label: "기타", period: "비정기", noTrack: true, excludeFromPct: true },
     ],
   },
   {
@@ -21,6 +22,7 @@ export const OBJECTIVES = [
       { id: "kr2-2", label: "PA 업무 배분 (담당 프로젝트)", target: 100, unit: "%", period: "전건", noTrack: true },
       { id: "kr2-3", label: "아침 스크럼 회의", target: 260, unit: "회", period: "매일", noTrack: true },
       { id: "kr2-4", label: "PA 면담", target: 4, unit: "회", period: "분기 1회" },
+      { id: "kr2-5", label: "기타", period: "비정기", noTrack: true, excludeFromPct: true },
     ],
   },
   {
@@ -32,6 +34,7 @@ export const OBJECTIVES = [
     keyResults: [
       { id: "kr3-1", label: "AI 활용 개선 사례", target: 3, unit: "건", period: "합계 3건" },
       { id: "kr3-2", label: "팀 내 실제 적용", target: 2, unit: "건", period: "합계 2건" },
+      { id: "kr3-3", label: "기타", period: "비정기", noTrack: true, excludeFromPct: true },
     ],
   },
 ];
