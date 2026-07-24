@@ -159,7 +159,7 @@ export default function OKRTracker() {
         { data: memoRows },
       ] = await Promise.all([
         supabase.from("okr_progress").select("*").then(r => r.error ? { data: [] } : r),
-        supabase.from("okr_logs").select("*").order("created_at", { ascending: false }).then(r => r.error ? { data: [] } : r),
+        supabase.from("okr_logs_list").select("*").order("created_at", { ascending: false }).then(r => r.error ? { data: [] } : r),
         supabase.from("okr_achievements").select("*").order("created_at", { ascending: false }).then(r => r.error ? { data: [] } : r),
         supabase.from("okr_memos").select("*").order("created_at", { ascending: false }).then(r => r.error ? { data: [] } : r),
       ]);
